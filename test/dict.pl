@@ -3,23 +3,24 @@
 :- use_module('../src/dict').
 
 test("add/get", (
-  V=1,
-  add(foo,D,V),
-  add(bar,D,2),
-  add(goo,D,2),
-  get(foo,D,V1),
-  V=V1
+  add(foo,D,1),
+  add("bar",D,2),
+  add(333,D,3),
+  get(foo,D,1),
+  get("bar",D,2),
+  get(333,D,3)
 )).
 
 test("put", (
-  V=1,
-  add(foo,D,V),
-  add(bar,D,2),
-  add(goo,D,2),
-  V1=2,
-  put(foo,D,V1,D1),
-  get(foo,D1,V2),
-  V1=V2
+  add(foo,D,1),
+  add("bar",D,2),
+  add(333,D,3),
+  put(foo,D,2,D1),
+  put("bar",D1,3,D2),
+  put(333,D2,4,D3),
+  get(foo,D3,2),
+  get("bar",D3,3),
+  get(333,D3,4)
 )).
 
 test("dict_list", (
