@@ -104,14 +104,15 @@ balance(D, D1) :-
   balance_([D1-Ms]).
 
 balance_([]).
-balance_([_-[]|Tasks]) :-
-  balance_(Tasks).
-balance_([D-[L|Ls]|Tasks]) :-
-  divide([L|Ls], Left, [Root|Right]),
-  D = dict(Root, LeftD, RightD),
-  Ms = [LeftD-Left|Tasks],
-  Ns = [RightD-Right|Ms],
-  balance_(Ns).
+balance_([D-Ls|Tasks]) :-
+  (   Ls = [] ->
+      balance_(Tasks)
+  ;   divide(Ls, Left, [Root|Right]),
+      D = dict(Root, LeftD, RightD),
+      Ms = [LeftD-Left|Tasks],
+      Ns = [RightD-Right|Ms],
+      balance_(Ns)
+  ).
 
 divide(Ls, Left, Right) :-
   list_midpoint(Ls, Mid),
