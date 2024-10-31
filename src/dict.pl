@@ -27,7 +27,7 @@
 
 */
 
-:- module(dict, [add/3, balance/2, get/3, put/4, dict_list/2]).
+:- module(dict, [add/3, balance/2, get/3, height/2, put/4, to_list/2]).
 :- use_module(library(lists)).
 
 % thanks Sterling and Shapiro ❤
@@ -56,7 +56,7 @@ lookup(Key, dict(Key1-Value1, Left, Right), Value) :-
   ;   lookup(Key, Right, Value)
   ).
 
-% fails if key doesn't exist
+% fails if key doesn't exist, harder to get wrong
 get(Key, Dict, Value) :-
   lookup(Key, Dict, Value), nonvar(Value).
 
@@ -75,35 +75,47 @@ put(Key, dict(Key1-Value1, Left, Right), Value, Dict1) :-
       Dict1 = dict(Key1-Value1, Left, Dict2)
   ).
 
-% serialize a dict to a list of pairs, or vice-versa!
+% serialize a dict to a list of pairs
 % Since we're using the pair-type, other functions like keysort/2
 % work on the list...
-dict_list(Dict, Ls) :-
-  dict_list_(Dict, [], Ls).
+to_list(D,Ls) :-
+  to_list_([D|Hole],Hole,[],Ls).
 
-dict_list_(dict(K-_, _, _), Acc, Acc) :-
-  var(K), !.
-
-dict_list_(dict(Key-Value, Left, Right), Acc, Ls) :-
-  AccLeft = [Key-Value|Acc],
-  dict_list_(Left, AccLeft, LsLeft),
-  dict_list_(Right, LsLeft, Ls).
+to_list_([D|Ds],Hole,Acc,Ls) :-
+  dict(Root,Left,Right) = D,
+  (   Left = nil ->
+      Hole = Hole1
+  ;   Hole = [Left|Hole1]
+  ),
+  (   Right = nil ->
+      Hole1 = Hole2
+  ;   Hole1 = [Right|Hole2]
+  ),
+  (   Ds = [] ->
+      Ls=[Root|Acc]
+  ;   to_list_(Ds,Hole2,[Root|Acc],Ls)
+  ).
 
 % ...and since we can sort our pairs so easily, balancing the tree is trivial
 balance(D, D1) :-
   nonvar(D),
-  dict_list(D, Ls),
+  to_list(D, Ls),
   keysort(Ls, Ms),
-  balance_(Ms, D1).
+  balance_([D1-Ms]).
 
-balance_([], dict(_-_,_,_)).
-balance_([L|Ls], D1) :-
-  Ms = [L|Ls],
-  list_midpoint(Ms, Mid),
-  list_split(Ms, Mid, Left, [Root|Right]),
-  balance_(Left, LeftD),
-  balance_(Right, RightD),
-  D1 = dict(Root, LeftD, RightD).
+balance_([]).
+balance_([_-[]|Tasks]) :-
+  balance_(Tasks).
+balance_([D-[L|Ls]|Tasks]) :-
+  divide([L|Ls], Left, [Root|Right]),
+  D = dict(Root, LeftD, RightD),
+  Ms = [LeftD-Left|Tasks],
+  Ns = [RightD-Right|Ms],
+  balance_(Ns).
+
+divide(Ls, Left, Right) :-
+  list_midpoint(Ls, Mid),
+  list_split(Ls, Mid, Left, Right).
 
 list_midpoint([], _) :- false.
 list_midpoint(Ls, Midpoint) :-
@@ -116,3 +128,18 @@ list_split(Ls, I, Ms, Ns) :-
   Ns = [E|_],
   append(Ms, Ns, Ls),
   !.
+
+height(D,H) :-
+  height_([-1-D|Hole],Hole,H).
+
+height_([Acc-D|Tasks],Hole,H) :-
+  (   var(D) ->
+      (   Tasks = [] ->
+          H is Acc
+      ;   height_(Tasks,Hole,H)
+      )
+  ;   dict(_, Left, Right) = D,
+      Acc1 is Acc + 1,
+      Hole = [Acc1-Left, Acc1-Right|Hole1],
+      height_(Tasks,Hole1,H)
+  ).

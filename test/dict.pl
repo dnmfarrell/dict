@@ -23,21 +23,28 @@ test("put", (
   get(333,D3,4)
 )).
 
-test("dict_list", (
+test("to_list", (
   Ls = [c-3,f-1,a-2,b-2],
   add(b,D,2),
   add(f,D,1),
   add(a,D,2),
   add(c,D,3),
-  dict_list(D, Ls)
+  to_list(D, Ls)
 )).
 
-test("balance", (
-  BalancedList = [g-1,e-1,f-1,c-1,a-1,b-1,d-1],
-  keysort(BalancedList, WorstList),
-  dict_list(WorstTree, WorstList),
+test("height/balance", (
+  EmptyTree = _,
+  height(EmptyTree, -1),
+  add(a,WorstTree,1),
+  add(b,WorstTree,2),
+  add(c,WorstTree,3),
+  add(d,WorstTree,4),
+  add(e,WorstTree,5),
+  add(f,WorstTree,6),
+  add(g,WorstTree,7),
+  height(WorstTree, 6),
   balance(WorstTree, BalancedTree),
-  dict_list(BalancedTree, BalancedList)
+  height(BalancedTree, 2)
 )).
 
 main :-
