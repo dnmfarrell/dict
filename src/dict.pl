@@ -130,17 +130,18 @@ list_split(Ls, I, Ms, Ns) :-
   append(Ms, Ns, Ls),
   !.
 
-height(D,H) :-
-  height_([-1-D|Hole],Hole,H).
+height(Dict,Height) :-
+  height_(Dict,-1,Height).
 
-height_([Acc-D|Tasks],Hole,H) :-
-  (   var(D) ->
-      (   Tasks = [] ->
-          H is Acc
-      ;   height_(Tasks,Hole,H)
-      )
-  ;   dict(_, Left, Right) = D,
-      Acc1 is Acc + 1,
-      Hole = [Acc1-Left, Acc1-Right|Hole1],
-      height_(Tasks,Hole1,H)
-  ).
+height_(Dict,Depth,Height) :-
+  (  Dict = nil ->
+     Height = Depth
+  ;  Dict = dict(_,Left,Right),
+     height_(Left,Depth,LeftDepth),
+     height_(Right,Depth,RightDepth),
+     (   LeftDepth > RightDepth ->
+         Height is LeftDepth + 1
+     ;   Height is RightDepth + 1
+     )
+   ).
+

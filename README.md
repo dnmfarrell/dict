@@ -6,7 +6,6 @@ Inspired by Chapter 15.3 from [The Art of Prolog](https://mitpress.mit.edu/97802
 Tested with [Scryer Prolog](https://scryer.pl).
 
 ## Exports
-
 * `add(+Key, ?Dict, ?Value)` - adds a key-value pair to the dictionary, if it doesn't already exist.
 * `balance(+Dict, -Dict)` - balances a dictionary.
 * `get(+Key, +Dict, -Value)` - gets the value associated with the key. Fails if key does not exist.
@@ -15,10 +14,11 @@ Tested with [Scryer Prolog](https://scryer.pl).
 * `to_list(+Dict, -List)` - serializes a dictionary to a list of key-value pairs.
 
 ## Testing
-
     $ scryer-prolog -f test/dict.pl
     Running test "add/get"
     Running test "put"
     Running test "to_list"
     Running test "height/balance"
 
+## See Also
+Many prologs ship with a balanced tree dictionary implementation called [assoc](https://www.scryer.pl/assoc).
