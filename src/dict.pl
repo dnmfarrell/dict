@@ -101,18 +101,16 @@ balance(D, D1) :-
   nonvar(D),
   to_list(D, Ls),
   keysort(Ls, Ms),
-  balance_([D1-Ms]).
+  balance_(Ms, D1).
 
-balance_([]).
-balance_([D-Ls|Tasks]) :-
-  (   Ls = [] ->
-      balance_(Tasks)
-  ;   divide(Ls, Left, [Root|Right]),
-      D = dict(Root, LeftD, RightD),
-      Ms = [LeftD-Left|Tasks],
-      Ns = [RightD-Right|Ms],
-      balance_(Ns)
-  ).
+balance_([], _).
+balance_([L|Ls], D1) :-
+  Ms = [L|Ls],
+  list_midpoint(Ms, Mid),
+  list_split(Ms, Mid, Left, [Root|Right]),
+  balance_(Left, LeftD),
+  balance_(Right, RightD),
+  D1 = dict(Root, LeftD, RightD).
 
 divide(Ls, Left, Right) :-
   list_midpoint(Ls, Mid),
@@ -144,4 +142,3 @@ height_(Dict,Depth,Height) :-
      ;   Height is RightDepth + 1
      )
    ).
-
